@@ -20,26 +20,26 @@
             font-weight: bold;
         }
     </style>
-    
-    <!-- ✅ 카카오 지도 API 로드 -->
-    <script 
-        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry"
-        defer>
-    </script>
-
-</head>
-<body>
-
-    <h1>위치 인증 시스템</h1>
-    <div id="map"></div>
-    <div id="controls">
-        <input type="text" id="locationInput" placeholder="기준 위치 (예: 서울특별시 강남구)">
-        <button onclick="setTargetLocation()">📍 기준 위치 설정</button>
-        <button onclick="verifyUserLocation()">✅ 내 위치 인증</button>
-        <p id="statusMessage">🔵 위치를 설정하고 인증을 진행하세요.</p>
-    </div>
 
     <script>
+        function loadKakaoMap() {
+            if (window.kakao && kakao.maps) {
+                console.log("✅ 카카오 API 이미 로드됨!");
+                initMap();
+                return;
+            }
+
+            console.log("🚀 카카오 지도 API 로드 시작...");
+            const script = document.createElement("script");
+            script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry";
+            script.async = true;
+            script.onload = function () {
+                console.log("✅ 카카오 지도 API 로드 완료!");
+                initMap();
+            };
+            document.head.appendChild(script);
+        }
+
         let map;
         let geocoder;
         let targetLocation = null;
@@ -48,9 +48,8 @@
         let radiusCircle = null;
 
         function initMap() {
-            // ✅ 카카오 API가 로드되었는지 확인
             if (!window.kakao || !kakao.maps) {
-                console.error("❌ 카카오 API가 아직 로드되지 않았습니다!");
+                console.error("❌ 카카오 API가 로드되지 않았습니다!");
                 return;
             }
 
@@ -60,7 +59,7 @@
             });
 
             geocoder = new kakao.maps.services.Geocoder();
-            console.log("✅ 카카오 지도 API 로드 완료!");
+            console.log("✅ 카카오 지도 초기화 완료!");
         }
 
         function setTargetLocation() {
@@ -85,13 +84,12 @@
 
                     map.setCenter(targetLocation);
 
-                    // 기존 원 삭제 후 새 원 추가
                     if (radiusCircle) {
                         radiusCircle.setMap(null);
                     }
                     radiusCircle = new kakao.maps.Circle({
                         center: targetLocation,
-                        radius: 300, // 300m 반경
+                        radius: 300,
                         strokeWeight: 3,
                         strokeColor: "#FF0000",
                         strokeOpacity: 0.8,
@@ -164,20 +162,21 @@
             }
         }
 
-        // ✅ API가 로드되면 initMap 실행
         window.onload = function() {
-            if (window.kakao && kakao.maps) {
-                initMap();
-            } else {
-                setTimeout(() => {
-                    if (window.kakao && kakao.maps) {
-                        initMap();
-                    } else {
-                        console.error("❌ 카카오 API가 로드되지 않았습니다.");
-                    }
-                }, 1000);
-            }
+            loadKakaoMap();
         };
     </script>
+</head>
+<body>
+
+    <h1>위치 인증 시스템</h1>
+    <div id="map"></div>
+    <div id="controls">
+        <input type="text" id="locationInput" placeholder="기준 위치 (예: 서울특별시 강남구)">
+        <button onclick="setTargetLocation()">📍 기준 위치 설정</button>
+        <button onclick="verifyUserLocation()">✅ 내 위치 인증</button>
+        <p id="statusMessage">🔵 위치를 설정하고 인증을 진행하세요.</p>
+    </div>
+
 </body>
 </html>
