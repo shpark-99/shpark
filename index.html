@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>위치 인증 시스템</title>
-  <!-- 동기 방식으로 스크립트를 로드 (async, defer 없이) -->
+  <!-- 동기 로드: async, defer 없이 스크립트를 바로 포함 -->
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry"></script>
   <style>
     #map { width: 100%; height: 400px; margin-bottom: 10px; }
@@ -28,7 +28,7 @@
     function initMap() {
       console.log("✅ initMap() 실행 중...");
       const container = document.getElementById('map');
-      // kakao.maps.LatLng를 바로 사용 (동기 로드 방식이므로 정상 작동해야 함)
+      // kakao.maps.LatLng를 사용하여 기본 위치(서울)를 설정
       map = new kakao.maps.Map(container, { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 5 });
       geocoder = new kakao.maps.services.Geocoder();
       console.log("✅ 카카오 지도 초기화 완료!");
@@ -42,11 +42,14 @@
       }
       geocoder.addressSearch(address, function(result, status) {
         if (status === kakao.maps.services.Status.OK) {
-          const lat = result[0].y;
-          const lng = result[0].x;
+          const lat = result[0].y, lng = result[0].x;
           targetLocation = new kakao.maps.LatLng(lat, lng);
+          
+          // 기준 위치 마커 갱신
           if (baseMarker) baseMarker.setMap(null);
           baseMarker = new kakao.maps.Marker({ map: map, position: targetLocation, title: "기준 위치" });
+          
+          // 300m 반경 원 그리기
           if (circle) circle.setMap(null);
           circle = new kakao.maps.Circle({
             map: map,
@@ -59,6 +62,7 @@
             fillColor: '#FF0000',
             fillOpacity: 0.2
           });
+          
           map.setCenter(targetLocation);
           alert("✅ 기준 위치 설정 완료!");
         } else {
@@ -74,9 +78,10 @@
       }
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
-          const userLat = position.coords.latitude;
-          const userLng = position.coords.longitude;
+          const userLat = position.coords.latitude, userLng = position.coords.longitude;
           const userLocation = new kakao.maps.LatLng(userLat, userLng);
+          
+          // 내 위치 마커 갱신
           if (userMarker) userMarker.setMap(null);
           userMarker = new kakao.maps.Marker({
             map: map,
@@ -88,6 +93,7 @@
               { offset: new kakao.maps.Point(20, 40) }
             )
           });
+          
           checkDistance(userLocation);
         }, function() {
           alert("❌ 위치 정보를 가져올 수 없습니다!");
@@ -98,9 +104,14 @@
     }
 
     function checkDistance(userLocation) {
+      // geometry 라이브러리가 제대로 로드되었는지 확인
+      if (!kakao.maps.geometry) {
+        alert("❌ kakao.maps.geometry가 로드되지 않았습니다. 라이브러리 설정을 확인하세요.");
+        return;
+      }
       const distance = kakao.maps.geometry.computeDistanceBetween(targetLocation, userLocation);
       console.log(`📏 거리: ${distance.toFixed(2)}m`);
-      const statusMessage = document.getElementById('statusMessage');
+      const statusMessage = document.getElementById("statusMessage");
       if (distance <= 300) {
         alert("✅ 위치 인증 성공! 기준 위치 반경 300m 이내입니다.");
         statusMessage.innerText = "✅ 인증 성공: 반경 300m 이내입니다.";
@@ -112,7 +123,7 @@
       }
     }
 
-    // window.onload에서 initMap()을 호출하여 동기적으로 API 로드 후 실행됨.
+    // 동기 방식으로 API가 로드되었으므로 window.onload에서 initMap() 호출
     window.onload = initMap;
   </script>
 </body>
