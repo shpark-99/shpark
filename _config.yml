@@ -1,0 +1,5 @@
+# Jekyll 비활성화 설정
+theme: null
+exclude:
+  - README.md
+  - assets/css/style.scss
