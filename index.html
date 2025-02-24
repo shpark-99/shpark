@@ -20,6 +20,13 @@
             font-weight: bold;
         }
     </style>
+    
+    <!-- ✅ 카카오 지도 API 로드 -->
+    <script 
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry"
+        defer>
+    </script>
+
 </head>
 <body>
 
@@ -32,7 +39,7 @@
         <p id="statusMessage">🔵 위치를 설정하고 인증을 진행하세요.</p>
     </div>
 
-    <script type="text/javascript">
+    <script>
         let map;
         let geocoder;
         let targetLocation = null;
@@ -40,24 +47,20 @@
         let userMarker = null;
         let radiusCircle = null;
 
-        function loadKakaoMap() {
-            const script = document.createElement("script");
-            script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry";
-            script.async = true;
-            script.onload = () => {
-                console.log("✅ 카카오 지도 API 로드 완료!");
-                initMap();
-            };
-            document.head.appendChild(script);
-        }
-
         function initMap() {
+            // ✅ 카카오 API가 로드되었는지 확인
+            if (!window.kakao || !kakao.maps) {
+                console.error("❌ 카카오 API가 아직 로드되지 않았습니다!");
+                return;
+            }
+
             map = new kakao.maps.Map(document.getElementById("map"), {
                 center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 기본 위치
                 level: 5
             });
 
             geocoder = new kakao.maps.services.Geocoder();
+            console.log("✅ 카카오 지도 API 로드 완료!");
         }
 
         function setTargetLocation() {
@@ -141,7 +144,7 @@
         }
 
         function checkDistance(userLocation) {
-            if (!kakao.maps || !kakao.maps.geometry || !targetLocation) {
+            if (!window.kakao || !kakao.maps.geometry || !targetLocation) {
                 console.error("❌ 지도 API가 아직 로드되지 않았거나 기준 위치가 설정되지 않음!");
                 return;
             }
@@ -161,7 +164,20 @@
             }
         }
 
-        window.onload = loadKakaoMap;
+        // ✅ API가 로드되면 initMap 실행
+        window.onload = function() {
+            if (window.kakao && kakao.maps) {
+                initMap();
+            } else {
+                setTimeout(() => {
+                    if (window.kakao && kakao.maps) {
+                        initMap();
+                    } else {
+                        console.error("❌ 카카오 API가 로드되지 않았습니다.");
+                    }
+                }, 1000);
+            }
+        };
     </script>
 </body>
 </html>
