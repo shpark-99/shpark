@@ -3,17 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>위치 인증 시스템</title>
-    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services"></script>
-    <script defer src="script.js"></script>
+    <title>위치 인증 서비스</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        h1 { font-size: 24px; }
+        .container { margin-top: 30px; }
+        button {
+            font-size: 18px; padding: 15px; margin: 10px;
+            border: none; cursor: pointer; width: 200px;
+            border-radius: 8px;
+        }
+        .admin-btn { background-color: #4CAF50; color: white; }
+        .user-btn { background-color: #008CBA; color: white; }
+        .admin-btn:hover { background-color: #45a049; }
+        .user-btn:hover { background-color: #007bb5; }
+    </style>
 </head>
 <body>
-    <input type="text" id="adminAddress" placeholder="관리자 위치 주소 입력">
-    <button onclick="setAdminLocation(document.getElementById('adminAddress').value)">위치 설정</button>
+    <h1>🔍 위치 인증 서비스</h1>
+    <p>관리자는 위치를 설정하고, 사용자는 위치 인증을 진행할 수 있습니다.</p>
     
-    <div id="map" style="width:100%; height:400px;"></div>
-    <div>사용자 위치: <span id="userAddress"></span></div>
-    <div id="result"></div>
-    <button id="nextPageBtn" style="display:none;" onclick="location.href='nextPage.html'">다음 페이지 이동</button>
+    <div class="container">
+        <button class="admin-btn" onclick="location.href='admin.html'">📍 관리자 페이지</button>
+        <button class="user-btn" onclick="location.href='user.html'">👤 사용자 인증</button>
+    </div>
 </body>
 </html>
