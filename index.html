@@ -71,7 +71,9 @@
             }
 
             const userLocation = new kakao.maps.LatLng(userLat, userLng);
-            const distance = kakao.maps.services.Util.getDistance(targetLocation, userLocation); // 거리 계산
+            const distance = kakao.maps.geometry.spherical.computeDistanceBetween(targetLocation, userLocation); // 거리 계산
+            console.log(`📏 거리: ${distance}m`); // 디버깅 로그
+
             const statusMessage = document.getElementById('statusMessage');
 
             if (distance <= 300) {
@@ -128,6 +130,8 @@
                 navigator.geolocation.getCurrentPosition(function(position) {
                     const userLat = position.coords.latitude;
                     const userLng = position.coords.longitude;
+                    console.log(`📍 내 위치: ${userLat}, ${userLng}`); // 디버깅 로그
+
                     const userLocation = new kakao.maps.LatLng(userLat, userLng);
 
                     // 사용자 위치 마커 설정
@@ -145,11 +149,12 @@
 
                     // 거리 확인 후 인증
                     checkDistance(userLat, userLng);
-                }, function() {
-                    alert("위치 정보를 가져올 수 없습니다.");
+                }, function(error) {
+                    console.error("위치 정보를 가져올 수 없습니다.", error);
+                    alert("❌ 위치 정보를 가져올 수 없습니다.");
                 });
             } else {
-                alert("브라우저가 위치 정보를 지원하지 않습니다.");
+                alert("❌ 브라우저가 위치 정보를 지원하지 않습니다.");
             }
         });
 
