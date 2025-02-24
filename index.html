@@ -25,7 +25,7 @@
         function loadKakaoMap() {
             if (window.kakao && kakao.maps) {
                 console.log("✅ 카카오 API 이미 로드됨!");
-                initMap();
+                kakao.maps.load(initMap);
                 return;
             }
 
@@ -35,7 +35,7 @@
             script.async = true;
             script.onload = function () {
                 console.log("✅ 카카오 지도 API 로드 완료!");
-                initMap();
+                kakao.maps.load(initMap);
             };
             document.head.appendChild(script);
         }
@@ -52,6 +52,8 @@
                 console.error("❌ 카카오 API가 로드되지 않았습니다!");
                 return;
             }
+
+            console.log("✅ initMap() 실행 중...");
 
             map = new kakao.maps.Map(document.getElementById("map"), {
                 center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 기본 위치
