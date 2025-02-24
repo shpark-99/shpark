@@ -1,34 +1,41 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-     <!-- 카카오 맵 API -->
-    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>위치 인증 시스템</title>
-
-    <!-- 스타일시트 연결 -->
-    <link rel="stylesheet" href="styles.css">
-
-   
+    <title>Kakao Maps API 테스트</title>
+    <style>
+        #map { width: 100%; height: 400px; }
+    </style>
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry"></script>
 </head>
 <body>
-
-    <h2>📍 위치 인증 시스템</h2>
-    
-    <div>
-        <input type="text" id="addressInput" placeholder="기준 위치 주소 입력">
-        <button id="setLocationBtn" onclick="setBaseLocation()">📍 기준 위치 설정</button>
-    </div>
-    
-    <br>
-    <button id="verifyButton" onclick="verifyMyLocation()" disabled>내 위치 인증</button>
-    <p id="statusMessage">⏳ 위치 인증 대기 중...</p>
-    
+    <h1>Kakao 지도 테스트</h1>
     <div id="map"></div>
 
-    <!-- JavaScript 연결 -->
-    <script src="script.js"></script>
+    <script>
+        kakao.maps.load(function() {  // ✅ 반드시 load 안에서 실행!
+            if (!window.kakao || !window.kakao.maps) {
+                console.error("❌ Kakao Maps API가 정상적으로 로드되지 않음");
+                return;
+            }
 
+            if (!window.kakao.maps.geometry) {
+                console.error("❌ Kakao Maps API의 'geometry' 라이브러리가 로드되지 않음");
+                return;
+            }
+
+            console.log("✅ Kakao Maps API 로드 완료");
+
+            const container = document.getElementById("map");
+            const options = {
+                center: new kakao.maps.LatLng(37.5665, 126.978), // 기본 위치 (서울)
+                level: 3,
+            };
+
+            const map = new kakao.maps.Map(container, options);
+            console.log("✅ 지도 생성 완료");
+        });
+    </script>
 </body>
 </html>
