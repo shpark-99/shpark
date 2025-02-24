@@ -1,152 +1,115 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>위치 인증 시스템</title>
-<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry"></script>
-<style>
-    #map { width: 100%; height: 400px; margin-bottom: 10px; }
-    #statusMessage { font-size: 16px; font-weight: bold; }
-    button:disabled { background-color: gray; cursor: not-allowed; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쿠키 인증 시스템</title>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services,geometry"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #statusMessage { font-size: 16px; font-weight: bold; color: blue; }
+        button:disabled { background-color: gray; cursor: not-allowed; }
+    </style>
 </head>
 <body>
-<h2>📍 위치 인증 시스템</h2>
-<div>
-    <input type="text" id="addressInput" placeholder="기준 위치 주소 입력">
-    <button id="setLocationBtn" onclick="setBaseLocation()">📍 기준 위치 설정</button>
-</div>
-<br>
-<button id="verifyButton" onclick="verifyMyLocation()" disabled>내 위치 인증</button>
-<p id="statusMessage">⏳ 위치 인증 대기 중...</p>
-<div id="map"></div>
 
-<script>
-let map, geocoder, baseMarker, userMarker, circle, targetLocation = null;
+    <h2>🍪 크롬 서드파티 쿠키 차단 대응 시스템</h2>
 
-function initMap() {
-    console.log("✅ initMap() 실행 중...");
-    const container = document.getElementById('map');
-    map = new kakao.maps.Map(container, { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 5 });
-    geocoder = new kakao.maps.services.Geocoder();
-    console.log("✅ 카카오 지도 초기화 완료!");
+    <button id="checkCookieButton">쿠키 상태 확인</button>
+    <button id="setCookieButton">쿠키 설정</button>
+    <button id="clearCookieButton">쿠키 삭제</button>
 
-    // Kakao API 로드 후 geometry 사용 가능 여부 확인
-    setTimeout(() => {
-        if (!kakao.maps.geometry) {
-            console.error("❌ Kakao Maps geometry 라이브러리 로드 실패! 다시 시도합니다...");
-            location.reload();
-        } else {
-            console.log("✅ Kakao Maps API 정상 로드됨");
+    <p id="statusMessage">⏳ 쿠키 상태 확인 중...</p>
+
+    <script>
+        const COOKIE_NAME = "auth_token";
+        const STORAGE_KEY = "auth_token_storage";
+
+        // ✅ 서드파티 쿠키 차단 여부 감지 함수
+        function checkThirdPartyCookies() {
+            document.cookie = "test_cookie=1; SameSite=None; Secure";
+            
+            setTimeout(() => {
+                if (!document.cookie.includes("test_cookie")) {
+                    console.warn("⚠ 서드파티 쿠키가 차단되었습니다.");
+                    updateStatusMessage("⚠ 서드파티 쿠키 차단 감지됨! 대체 저장 방식 사용 중.", "red");
+
+                    // 쿠키 차단 시 로컬 스토리지 또는 세션 스토리지로 전환
+                    if (!localStorage.getItem(STORAGE_KEY)) {
+                        localStorage.setItem(STORAGE_KEY, "your_auth_token_value");
+                    }
+                } else {
+                    console.log("✅ 서드파티 쿠키 사용 가능");
+                    updateStatusMessage("✅ 서드파티 쿠키 사용 가능", "green");
+                }
+            }, 500);
         }
-    }, 3000);
-}
 
-function setBaseLocation() {
-    const address = document.getElementById("addressInput").value.trim();
-    const setLocationBtn = document.getElementById("setLocationBtn");
-    
-    if (!address) {
-        alert("📌 주소를 입력하세요!");
-        return;
-    }
-
-    // 버튼 비활성화 (사용자가 중복 클릭 못 하도록)
-    setLocationBtn.disabled = true;
-
-    geocoder.addressSearch(address, function(result, status) {
-        if (status === kakao.maps.services.Status.OK) {
-            const lat = result[0].y, lng = result[0].x;
-            targetLocation = new kakao.maps.LatLng(lat, lng);
-
-            // 기존 마커 및 원 삭제 후 새로 생성
-            if (baseMarker) baseMarker.setMap(null);
-            baseMarker = new kakao.maps.Marker({ map: map, position: targetLocation, title: "기준 위치" });
-
-            if (circle) circle.setMap(null);
-            circle = new kakao.maps.Circle({
-                map: map, center: targetLocation, radius: 300,
-                strokeWeight: 2, strokeColor: '#FF0000', strokeOpacity: 0.8,
-                fillColor: '#FF0000', fillOpacity: 0.2
-            });
-
-            map.setCenter(targetLocation);
-            document.getElementById("verifyButton").disabled = false; // 인증 버튼 활성화
-            updateStatusMessage("✅ 기준 위치 설정 완료! 위치 인증 가능.", "blue");
-        } else {
-            alert("❌ 주소 검색 실패! 올바른 주소를 입력하세요.");
+        // ✅ CHIPS (Partitioned Cookies) 지원 여부 확인
+        function checkCHIPS() {
+            try {
+                document.cookie = "chips_cookie=1; Partitioned; SameSite=None; Secure";
+                if (document.cookie.includes("chips_cookie")) {
+                    console.log("✅ CHIPS(Partitioned Cookies) 지원됨.");
+                    updateStatusMessage("✅ CHIPS(Partitioned Cookies) 지원됨", "blue");
+                } else {
+                    console.warn("⚠ CHIPS 미지원. 다른 저장 방식 고려 필요.");
+                }
+            } catch (error) {
+                console.error("❌ CHIPS 설정 중 오류 발생:", error);
+            }
         }
-        
-        // 버튼 다시 활성화
-        setLocationBtn.disabled = false;
-    });
-}
 
-function verifyMyLocation() {
-    if (!targetLocation) {
-        alert("❌ 기준 위치를 먼저 설정하세요!");
-        return;
-    }
+        // ✅ 쿠키 설정 함수
+        function setAuthCookie() {
+            if (navigator.cookieEnabled) {
+                document.cookie = `${COOKIE_NAME}=your_auth_token_value; SameSite=None; Secure; max-age=3600`;
+                console.log("✅ 인증 쿠키 설정 완료");
+                updateStatusMessage("✅ 인증 쿠키가 설정되었습니다.", "green");
+            } else {
+                console.warn("⚠ 브라우저에서 쿠키가 비활성화되었습니다.");
+                updateStatusMessage("⚠ 쿠키가 비활성화됨. 다른 저장 방식 사용!", "red");
 
-    const verifyButton = document.getElementById("verifyButton");
-    verifyButton.disabled = true; // 위치 인증 중 버튼 비활성화
+                // 쿠키 대신 로컬 스토리지에 저장
+                localStorage.setItem(STORAGE_KEY, "your_auth_token_value");
+            }
+        }
 
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                const userLat = position.coords.latitude, userLng = position.coords.longitude;
-                const userLocation = new kakao.maps.LatLng(userLat, userLng);
+        // ✅ 쿠키 삭제 함수
+        function clearAuthCookie() {
+            document.cookie = `${COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=None; Secure`;
+            localStorage.removeItem(STORAGE_KEY);
+            console.log("🗑 인증 쿠키 및 로컬 스토리지 삭제 완료");
+            updateStatusMessage("🗑 인증 데이터가 삭제되었습니다.", "black");
+        }
 
-                if (userMarker) userMarker.setMap(null);
-                userMarker = new kakao.maps.Marker({
-                    map: map, position: userLocation, title: "내 위치",
-                    image: new kakao.maps.MarkerImage(
-                        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
-                        new kakao.maps.Size(40, 40), { offset: new kakao.maps.Point(20, 40) }
-                    )
-                });
+        // ✅ 쿠키 또는 로컬 스토리지에서 인증 상태 확인
+        function checkAuthStatus() {
+            if (document.cookie.includes(COOKIE_NAME)) {
+                updateStatusMessage("✅ 쿠키를 통한 인증이 유지되고 있습니다.", "green");
+            } else if (localStorage.getItem(STORAGE_KEY)) {
+                updateStatusMessage("✅ 로컬 스토리지 인증 사용 중!", "blue");
+            } else {
+                updateStatusMessage("❌ 인증 정보가 없습니다.", "red");
+            }
+        }
 
-                checkDistance(userLocation);
-                verifyButton.disabled = false; // 인증 완료 후 버튼 다시 활성화
-            },
-            function(error) {
-                alert("❌ 위치 정보를 가져올 수 없습니다! (에러 코드: " + error.code + ")");
-                verifyButton.disabled = false; // 실패 시 버튼 다시 활성화
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
-        );
-    } else {
-        alert("❌ 이 브라우저에서는 위치 정보를 지원하지 않습니다!");
-        verifyButton.disabled = false;
-    }
-}
+        // ✅ 상태 메시지 업데이트 함수
+        function updateStatusMessage(message, color) {
+            const statusMessage = document.getElementById("statusMessage");
+            statusMessage.innerText = message;
+            statusMessage.style.color = color;
+        }
 
-function checkDistance(userLocation) {
-    if (!kakao.maps.geometry) {
-        alert("❌ Kakao Maps geometry 라이브러리가 없습니다. 페이지를 새로고침 해보세요.");
-        return;
-    }
+        // 버튼 이벤트 리스너 등록
+        document.getElementById("checkCookieButton").addEventListener("click", checkAuthStatus);
+        document.getElementById("setCookieButton").addEventListener("click", setAuthCookie);
+        document.getElementById("clearCookieButton").addEventListener("click", clearAuthCookie);
 
-    const distance = kakao.maps.geometry.computeDistanceBetween(targetLocation, userLocation);
-    console.log(`📏 거리: ${distance.toFixed(2)}m`);
+        // 페이지 로드 시 쿠키 및 CHIPS 지원 여부 확인
+        checkThirdPartyCookies();
+        checkCHIPS();
+    </script>
 
-    if (distance <= 300) {
-        updateStatusMessage("✅ 위치 인증 성공! 반경 300m 이내입니다.", "green");
-        document.getElementById("verifyButton").disabled = true; // 인증 완료 후 버튼 비활성화
-    } else {
-        updateStatusMessage("❌ 위치 인증 실패! 반경을 벗어났습니다.", "red");
-    }
-}
-
-function updateStatusMessage(message, color) {
-    const statusMessage = document.getElementById("statusMessage");
-    statusMessage.innerText = message;
-    statusMessage.style.color = color;
-}
-
-// Kakao Maps API가 로드된 후 initMap 실행
-kakao.maps.load(initMap);
-</script>
 </body>
 </html>
