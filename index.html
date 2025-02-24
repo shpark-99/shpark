@@ -44,7 +44,7 @@
     <p id="result"></p>
 
     <script>
-        let map, geocoder, targetMarker, targetLocation;
+        let map, geocoder, targetMarker, targetLocation = null;
         
         // 지도 초기화 (기본 위치: 서울 시청)
         function initMap() {
@@ -55,26 +55,24 @@
             };
             map = new kakao.maps.Map(mapContainer, mapOption);
             geocoder = new kakao.maps.services.Geocoder();
-
-            // 기본 기준 위치 마커 설정 (초기 위치)
-            targetLocation = new kakao.maps.LatLng(37.5665, 126.9780);
-            targetMarker = new kakao.maps.Marker({
-                position: targetLocation,
-                map: map
-            });
         }
 
-        // 거리 계산 함수
+        // 거리 계산 및 인증 함수
         function checkDistance(userLat, userLng) {
+            if (!targetLocation) {
+                alert("❌ 기준 위치를 먼저 설정하세요.");
+                return;
+            }
+
             const userLocation = new kakao.maps.LatLng(userLat, userLng);
             const distance = kakao.maps.services.Util.getDistance(targetLocation, userLocation); // 거리 계산
 
             if (distance <= 300) {
-                document.getElementById('result').innerText = "✅ 위치 인증 완료: 반경 300m 이내입니다.";
                 alert("✅ 위치 인증 성공! 기준 위치 반경 300m 이내입니다.");
+                document.getElementById('result').innerText = "✅ 위치 인증 완료: 반경 300m 이내입니다.";
             } else {
-                document.getElementById('result').innerText = "❌ 위치 인증 실패: 반경을 벗어났습니다.";
                 alert("❌ 위치 인증 실패! 기준 위치 반경을 벗어났습니다.");
+                document.getElementById('result').innerText = "❌ 위치 인증 실패: 반경을 벗어났습니다.";
             }
         }
 
@@ -91,9 +89,18 @@
                     targetLocation = new kakao.maps.LatLng(result[0].y, result[0].x);
 
                     // 지도 이동 및 마커 설정
+                    if (!targetMarker) {
+                        targetMarker = new kakao.maps.Marker({
+                            position: targetLocation,
+                            map: map
+                        });
+                    } else {
+                        targetMarker.setPosition(targetLocation);
+                    }
+
                     map.setCenter(targetLocation);
-                    targetMarker.setPosition(targetLocation);
                     document.getElementById('result').innerText = `📍 기준 위치: ${result[0].address_name}`;
+                    alert(`✅ 기준 위치 설정 완료! (${result[0].address_name})`);
                 } else {
                     alert("주소를 찾을 수 없습니다.");
                 }
@@ -102,6 +109,11 @@
 
         // 사용자 위치 가져오기 및 인증
         document.getElementById("checkLocation").addEventListener("click", function() {
+            if (!targetLocation) {
+                alert("❌ 기준 위치를 먼저 설정하세요.");
+                return;
+            }
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     const userLat = position.coords.latitude;
