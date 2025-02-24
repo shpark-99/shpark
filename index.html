@@ -4,26 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>위치 인증 서비스</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-        h1 { font-size: 24px; }
-        .container { margin-top: 30px; }
-        button {
-            font-size: 18px; padding: 15px; margin: 10px;
-            border: none; cursor: pointer; width: 200px;
-            border-radius: 8px;
-        }
-        .admin-btn { background-color: #4CAF50; color: white; }
-        .user-btn { background-color: #008CBA; color: white; }
-        .admin-btn:hover { background-color: #45a049; }
-        .user-btn:hover { background-color: #007bb5; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>🔍 위치 인증 서비스</h1>
-    <p>관리자는 위치를 설정하고, 사용자는 위치 인증을 진행할 수 있습니다.</p>
-    
     <div class="container">
+        <h1>🔍 위치 인증 서비스</h1>
+        <p>관리자는 위치를 설정하고, 사용자는 인증을 진행할 수 있습니다.</p>
         <button class="admin-btn" onclick="location.href='admin.html'">📍 관리자 페이지</button>
         <button class="user-btn" onclick="location.href='user.html'">👤 사용자 인증</button>
     </div>
