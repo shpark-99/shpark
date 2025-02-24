@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>사용자 위치 인증</title>
+    <link rel="stylesheet" href="style.css">
     <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services"></script>
     <script defer src="script-user.js"></script>
 </head>
 <body>
-    <h2>📌 사용자 위치 인증</h2>
-    <div>사용자 위치: <span id="userAddress"></span></div>
-    <div id="map" style="width:100%; height:400px;"></div>
+    <div class="header">
+        <h2>📌 사용자 위치 인증</h2>
+        <button class="nav-btn" onclick="location.href='admin.html'">← 관리자 페이지</button>
+    </div>
+    <div>설정된 위치: <span id="adminAddress"></span></div>
+    <div>내 위치: <span id="userAddress"></span></div>
+    <div id="map" class="map-container"></div>
     <div id="result"></div>
+    <button id="surveyBtn" class="hidden-btn" onclick="location.href='survey.html'">📋 설문 시작</button>
 </body>
 </html>
