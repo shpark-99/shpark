@@ -3,147 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>위치 인증 시스템</title>
+    <title>Kakao Maps API 테스트</title>
     <style>
-        #map {
-            width: 100%;
-            height: 500px;
-        }
+        #map { width: 100%; height: 400px; }
     </style>
 </head>
 <body>
-    <h2>📍 위치 인증 시스템</h2>
-    <button onclick="setBaseLocation()">📍 기준 위치 설정</button>
-    <button onclick="verifyMyLocation()">내 위치 인증</button>
+    <h1>Kakao 지도 테스트</h1>
     <div id="map"></div>
 
     <script>
-        let map;
-        let baseMarker;
-        let userMarker;
-        let basePosition;
-
-        function loadKakaoMapsAPI() {
-            return new Promise((resolve, reject) => {
-                if (window.kakao && window.kakao.maps) {
-                    console.log("✅ Kakao Maps API 이미 로드됨");
-                    resolve();
-                    return;
-                }
-
-                const script = document.createElement("script");
-                script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry";
-                script.async = true;
-                script.onload = () => {
-                    console.log("✅ Kakao Maps API 로드 완료");
-                    resolve();
-                };
-                script.onerror = () => reject(new Error("❌ Kakao Maps API 로드 실패"));
-                document.head.appendChild(script);
-            });
-        }
-
-        async function initMap() {
-            try {
-                await loadKakaoMapsAPI();
-
-                if (!window.kakao || !window.kakao.maps) {
-                    throw new Error("❌ Kakao Maps API가 정상적으로 로드되지 않음");
-                }
-
-                console.log("✅ initMap 실행됨");
-
-                const container = document.getElementById("map");
-                const options = {
-                    center: new kakao.maps.LatLng(37.5665, 126.978), // 기본 위치 (서울)
-                    level: 3,
-                };
-
-                map = new kakao.maps.Map(container, options);
-                console.log("✅ 지도 생성 완료");
-
-            } catch (error) {
-                console.error(error);
-                alert("지도 로드 중 오류 발생!");
-            }
-        }
-
-        function setBaseLocation() {
-            if (!map) {
-                alert("❌ 지도 로드 중입니다. 잠시 후 다시 시도하세요.");
+        function loadKakaoMapsAPI(callback) {
+            if (window.kakao && window.kakao.maps) {
+                console.log("✅ Kakao Maps API 이미 로드됨");
+                callback();
                 return;
             }
 
-            basePosition = map.getCenter(); // 현재 지도 중심을 기준 위치로 설정
-
-            if (baseMarker) baseMarker.setMap(null);
-
-            baseMarker = new kakao.maps.Marker({
-                position: basePosition,
-                map: map,
-            });
-
-            console.log("✅ 기준 위치 설정 완료:", basePosition);
-            alert(`📍 기준 위치 설정 완료!`);
+            const script = document.createElement("script");
+            script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry";
+            script.async = true;
+            script.onload = () => {
+                console.log("✅ Kakao Maps API 로드 완료");
+                callback();
+            };
+            script.onerror = () => console.error("❌ Kakao Maps API 로드 실패");
+            document.head.appendChild(script);
         }
 
-        function verifyMyLocation() {
-            if (!navigator.geolocation) {
-                alert("❌ 현재 브라우저에서 위치 정보를 지원하지 않습니다.");
+        function initMap() {
+            if (!window.kakao || !window.kakao.maps) {
+                console.error("❌ Kakao Maps API가 정상적으로 로드되지 않음");
                 return;
             }
 
-            if (!basePosition) {
-                alert("📍 먼저 기준 위치를 설정하세요.");
+            if (!window.kakao.maps.geometry) {
+                console.error("❌ Kakao Maps API의 'geometry' 라이브러리가 로드되지 않음");
                 return;
             }
 
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const userLat = position.coords.latitude;
-                    const userLng = position.coords.longitude;
-                    const userPosition = new kakao.maps.LatLng(userLat, userLng);
+            console.log("✅ initMap 실행됨");
 
-                    if (userMarker) userMarker.setMap(null);
+            const container = document.getElementById("map");
+            const options = {
+                center: new kakao.maps.LatLng(37.5665, 126.978), // 기본 위치 (서울)
+                level: 3,
+            };
 
-                    userMarker = new kakao.maps.Marker({
-                        position: userPosition,
-                        map: map,
-                    });
-
-                    map.setCenter(userPosition); // 사용자의 위치로 지도 이동
-
-                    console.log("✅ 현재 위치:", userLat, userLng);
-                    checkDistance(userLat, userLng, basePosition.getLat(), basePosition.getLng());
-                },
-                (error) => {
-                    console.error("❌ 위치 정보 가져오기 실패:", error);
-                    alert("❌ 위치 정보를 가져오는 데 실패했습니다.");
-                }
-            );
+            const map = new kakao.maps.Map(container, options);
+            console.log("✅ 지도 생성 완료");
         }
 
-        function checkDistance(userLat, userLng, targetLat, targetLng) {
-            if (!kakao.maps || !kakao.maps.geometry) {
-                alert("❌ kakao.maps.geometry 라이브러리가 로드되지 않았습니다.");
-                return;
-            }
-
-            const userPosition = new kakao.maps.LatLng(userLat, userLng);
-            const targetPosition = new kakao.maps.LatLng(targetLat, targetLng);
-            const distance = kakao.maps.geometry.computeDistanceBetween(userPosition, targetPosition);
-
-            console.log(`📏 거리 계산 결과: ${distance}m`);
-
-            if (distance <= 300) {
-                alert("✅ 인증 완료: 300m 이내");
-            } else {
-                alert("❌ 인증 실패: 300m 초과");
-            }
-        }
-
-        // 페이지 로드 후 지도 초기화
-        initMap();
+        loadKakaoMapsAPI(initMap);
     </script>
 </body>
 </html>
