@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카카오 지도 - 내 위치로 이동</title>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462"></script>
+</head>
+<body>
+    <h2>내 위치 기반 카카오 지도</h2>
+    <button id="getLocation">내 위치로 이동</button>
+    <div id="map" style="width:500px;height:400px;"></div>
+
+    <script>
+        // 지도를 담을 영역의 DOM 객체 가져오기
+        var container = document.getElementById('map'); 
+        var options = { 
+            center: new kakao.maps.LatLng(37.5665, 126.9780), // 기본 위치 (서울)
+            level: 3 // 확대/축소 레벨
+        };
+
+        // 지도 생성
+        var map = new kakao.maps.Map(container, options); 
+
+        // 내 위치로 이동 버튼 클릭 시 실행
+        document.getElementById("getLocation").addEventListener("click", function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lon = position.coords.longitude;
+                    var locPosition = new kakao.maps.LatLng(lat, lon);
+
+                    // 지도 중심 이동
+                    map.setCenter(locPosition);
+
+                    // 콘솔 로그로 확인
+                    console.log("내 위치 이동 완료:", lat, lon);
+
+                }, function(error) {
+                    console.error("위치 정보를 가져올 수 없습니다. 오류 코드:", error.code);
+                    alert("위치 정보를 가져올 수 없습니다. 브라우저 설정을 확인하세요.");
+                });
+            } else {
+                alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+            }
+        });
+    </script>
+</body>
+</html>
