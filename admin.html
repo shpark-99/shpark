@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 위치 설정</title>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services"></script>
+    <script defer src="script-admin.js"></script>
+</head>
+<body>
+    <h2>📍 관리자 위치 설정</h2>
+    <input type="text" id="adminAddress" placeholder="주소 입력">
+    <button onclick="setAdminLocation()">위치 저장</button>
+    <div id="map" style="width:100%; height:400px;"></div>
+</body>
+</html>
