@@ -4,102 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>위치 인증 시스템</title>
+    <script defer type="text/javascript" 
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry"></script>
     <style>
-        #map {
-            width: 100%;
-            height: 400px;
-        }
-        #controls {
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        #statusMessage {
-            font-size: 16px;
-            font-weight: bold;
-        }
+        #map { width: 100%; height: 400px; margin-bottom: 10px; }
+        #statusMessage { font-size: 16px; font-weight: bold; }
     </style>
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry" defer></script>
+</head>
+<body>
+    <h2>📍 위치 인증 시스템</h2>
+    <div>
+        <input type="text" id="addressInput" placeholder="기준 위치 주소 입력">
+        <button onclick="setBaseLocation()">기준 위치 설정</button>
+    </div>
+    <br>
+    <button onclick="verifyMyLocation()">내 위치 인증</button>
+    <p id="statusMessage">⏳ 위치 인증 대기 중...</p>
+    <div id="map"></div>
+
     <script>
-        let map;
-        let geocoder;
-        let targetLocation = null;
-        let targetMarker = null;
-        let userMarker = null;
-        let radiusCircle = null;
-
-        function loadKakaoMap() {
-            if (window.kakao && kakao.maps) {
-                console.log("✅ 카카오 API 이미 로드됨!");
-                kakao.maps.load(initMap);
-                return;
-            }
-
-            console.log("🚀 카카오 지도 API 로드 시작...");
-            const script = document.createElement("script");
-            script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry";
-            script.async = true;
-            script.onload = function () {
-                console.log("✅ 카카오 지도 API 로드 완료!");
-                kakao.maps.load(initMap);
-            };
-            document.head.appendChild(script);
-        }
+        let map, geocoder, baseMarker, userMarker, circle, targetLocation = null;
 
         function initMap() {
-            if (!window.kakao || !kakao.maps) {
-                console.error("❌ 카카오 API가 로드되지 않았습니다!");
+            if (!window.kakao || !window.kakao.maps) {
+                console.error("❌ Kakao Maps API 로드 실패!");
                 return;
             }
 
-            console.log("✅ initMap() 실행 중...");
-            try {
-                var testLatLng = new kakao.maps.LatLng(37.5665, 126.9780);
-                console.log("✅ kakao.maps.LatLng 정상 생성됨:", testLatLng);
-            } catch (error) {
-                console.error("❌ kakao.maps.LatLng 생성 실패!", error);
-                return;
-            }
-
-            map = new kakao.maps.Map(document.getElementById("map"), {
-                center: new kakao.maps.LatLng(37.5665, 126.9780),
-                level: 5
-            });
-
+            console.log("✅ Kakao API 로드 완료!");
+            const container = document.getElementById('map');
+            const options = { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 5 };
+            map = new kakao.maps.Map(container, options);
             geocoder = new kakao.maps.services.Geocoder();
-            console.log("✅ 카카오 지도 초기화 완료!");
         }
 
-        function setTargetLocation() {
-            const address = document.getElementById("locationInput").value;
+        function setBaseLocation() {
+            const address = document.getElementById("addressInput").value;
             if (!address) {
-                alert("🚨 주소를 입력하세요!");
+                alert("주소를 입력하세요!");
                 return;
             }
 
             geocoder.addressSearch(address, function(result, status) {
                 if (status === kakao.maps.services.Status.OK) {
-                    const latlng = new kakao.maps.LatLng(result[0].y, result[0].x);
-                    targetLocation = latlng;
+                    const lat = result[0].y;
+                    const lng = result[0].x;
+                    targetLocation = new kakao.maps.LatLng(lat, lng);
 
-                    if (targetMarker) targetMarker.setMap(null);
-                    targetMarker = new kakao.maps.Marker({ position: targetLocation, map: map });
-
-                    map.setCenter(targetLocation);
-
-                    if (radiusCircle) radiusCircle.setMap(null);
-                    radiusCircle = new kakao.maps.Circle({
-                        center: targetLocation,
-                        radius: 300,
-                        strokeWeight: 3,
-                        strokeColor: "#FF0000",
-                        strokeOpacity: 0.8,
-                        fillColor: "#FF0000",
-                        fillOpacity: 0.2,
-                        map: map
+                    if (baseMarker) baseMarker.setMap(null);
+                    baseMarker = new kakao.maps.Marker({
+                        map: map,
+                        position: targetLocation,
+                        title: "기준 위치"
                     });
 
+                    if (circle) circle.setMap(null);
+                    circle = new kakao.maps.Circle({
+                        map: map,
+                        center: targetLocation,
+                        radius: 300,
+                        strokeWeight: 2,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.8,
+                        strokeStyle: 'solid',
+                        fillColor: '#FF0000',
+                        fillOpacity: 0.2
+                    });
+
+                    map.setCenter(targetLocation);
                     alert("✅ 기준 위치 설정 완료!");
                 } else {
                     alert("❌ 주소 검색 실패! 올바른 주소를 입력하세요.");
@@ -107,50 +79,44 @@
             });
         }
 
-        function verifyUserLocation() {
+        function verifyMyLocation() {
             if (!targetLocation) {
-                alert("🚨 먼저 기준 위치를 설정하세요!");
+                alert("❌ 기준 위치를 먼저 설정하세요!");
                 return;
             }
 
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        const userLocation = new kakao.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    const userLocation = new kakao.maps.LatLng(userLat, userLng);
 
-                        if (userMarker) userMarker.setMap(null);
-                        userMarker = new kakao.maps.Marker({
-                            position: userLocation,
-                            map: map,
-                            image: new kakao.maps.MarkerImage(
-                                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-                                new kakao.maps.Size(24, 35)
-                            )
-                        });
+                    if (userMarker) userMarker.setMap(null);
+                    userMarker = new kakao.maps.Marker({
+                        map: map,
+                        position: userLocation,
+                        title: "내 위치",
+                        image: new kakao.maps.MarkerImage(
+                            "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+                            new kakao.maps.Size(40, 40),
+                            { offset: new kakao.maps.Point(20, 40) }
+                        )
+                    });
 
-                        map.setCenter(userLocation);
-                        checkDistance(userLocation);
-                    },
-                    function(error) {
-                        alert("❌ 위치 정보를 가져올 수 없습니다.");
-                        console.error("Geolocation Error: ", error);
-                    }
-                );
+                    checkDistance(userLocation);
+                }, function() {
+                    alert("❌ 위치 정보를 가져올 수 없습니다!");
+                });
             } else {
-                alert("❌ 이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+                alert("❌ 이 브라우저에서는 위치 정보를 지원하지 않습니다!");
             }
         }
 
         function checkDistance(userLocation) {
-            if (!window.kakao || !kakao.maps.geometry || !targetLocation) {
-                console.error("❌ 지도 API가 아직 로드되지 않았거나 기준 위치가 설정되지 않음!");
-                return;
-            }
-
             const distance = kakao.maps.geometry.computeDistanceBetween(targetLocation, userLocation);
             console.log(`📏 거리: ${distance.toFixed(2)}m`);
 
-            const statusMessage = document.getElementById("statusMessage");
+            const statusMessage = document.getElementById('statusMessage');
             if (distance <= 300) {
                 alert("✅ 위치 인증 성공! 기준 위치 반경 300m 이내입니다.");
                 statusMessage.innerText = "✅ 인증 성공: 반경 300m 이내입니다.";
@@ -162,21 +128,15 @@
             }
         }
 
-        window.onload = function() {
-            loadKakaoMap();
+        window.onload = function () {
+            console.log("✅ window.onload 실행됨");
+
+            // Kakao Maps API 로드 완료 후 initMap 실행
+            kakao.maps.load(function () {
+                console.log("✅ Kakao Maps API 로드 후 initMap 실행");
+                initMap();
+            });
         };
     </script>
-</head>
-<body>
-
-    <h1>위치 인증 시스템</h1>
-    <div id="map"></div>
-    <div id="controls">
-        <input type="text" id="locationInput" placeholder="기준 위치 (예: 서울특별시 강남구 테헤란로 403 )">
-        <button onclick="setTargetLocation()">📍 기준 위치 설정</button>
-        <button onclick="verifyUserLocation()">✅ 내 위치 인증</button>
-        <p id="statusMessage">🔵 위치를 설정하고 인증을 진행하세요.</p>
-    </div>
-
 </body>
 </html>
