@@ -3,113 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>쿠키 인증 시스템</title>
-    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services,geometry"></script>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        #statusMessage { font-size: 16px; font-weight: bold; color: blue; }
-        button:disabled { background-color: gray; cursor: not-allowed; }
-    </style>
+    <title>위치 인증 시스템</title>
+
+    <!-- 스타일시트 연결 -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- 카카오 맵 API -->
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services,geometry"></script>
 </head>
 <body>
 
-    <h2>🍪 크롬 서드파티 쿠키 차단 대응 시스템</h2>
+    <h2>📍 위치 인증 시스템</h2>
+    
+    <div>
+        <input type="text" id="addressInput" placeholder="기준 위치 주소 입력">
+        <button id="setLocationBtn" onclick="setBaseLocation()">📍 기준 위치 설정</button>
+    </div>
+    
+    <br>
+    <button id="verifyButton" onclick="verifyMyLocation()" disabled>내 위치 인증</button>
+    <p id="statusMessage">⏳ 위치 인증 대기 중...</p>
+    
+    <div id="map"></div>
 
-    <button id="checkCookieButton">쿠키 상태 확인</button>
-    <button id="setCookieButton">쿠키 설정</button>
-    <button id="clearCookieButton">쿠키 삭제</button>
-
-    <p id="statusMessage">⏳ 쿠키 상태 확인 중...</p>
-
-    <script>
-        const COOKIE_NAME = "auth_token";
-        const STORAGE_KEY = "auth_token_storage";
-
-        // ✅ 서드파티 쿠키 차단 여부 감지 함수
-        function checkThirdPartyCookies() {
-            document.cookie = "test_cookie=1; SameSite=None; Secure";
-            
-            setTimeout(() => {
-                if (!document.cookie.includes("test_cookie")) {
-                    console.warn("⚠ 서드파티 쿠키가 차단되었습니다.");
-                    updateStatusMessage("⚠ 서드파티 쿠키 차단 감지됨! 대체 저장 방식 사용 중.", "red");
-
-                    // 쿠키 차단 시 로컬 스토리지 또는 세션 스토리지로 전환
-                    if (!localStorage.getItem(STORAGE_KEY)) {
-                        localStorage.setItem(STORAGE_KEY, "your_auth_token_value");
-                    }
-                } else {
-                    console.log("✅ 서드파티 쿠키 사용 가능");
-                    updateStatusMessage("✅ 서드파티 쿠키 사용 가능", "green");
-                }
-            }, 500);
-        }
-
-        // ✅ CHIPS (Partitioned Cookies) 지원 여부 확인
-        function checkCHIPS() {
-            try {
-                document.cookie = "chips_cookie=1; Partitioned; SameSite=None; Secure";
-                if (document.cookie.includes("chips_cookie")) {
-                    console.log("✅ CHIPS(Partitioned Cookies) 지원됨.");
-                    updateStatusMessage("✅ CHIPS(Partitioned Cookies) 지원됨", "blue");
-                } else {
-                    console.warn("⚠ CHIPS 미지원. 다른 저장 방식 고려 필요.");
-                }
-            } catch (error) {
-                console.error("❌ CHIPS 설정 중 오류 발생:", error);
-            }
-        }
-
-        // ✅ 쿠키 설정 함수
-        function setAuthCookie() {
-            if (navigator.cookieEnabled) {
-                document.cookie = `${COOKIE_NAME}=your_auth_token_value; SameSite=None; Secure; max-age=3600`;
-                console.log("✅ 인증 쿠키 설정 완료");
-                updateStatusMessage("✅ 인증 쿠키가 설정되었습니다.", "green");
-            } else {
-                console.warn("⚠ 브라우저에서 쿠키가 비활성화되었습니다.");
-                updateStatusMessage("⚠ 쿠키가 비활성화됨. 다른 저장 방식 사용!", "red");
-
-                // 쿠키 대신 로컬 스토리지에 저장
-                localStorage.setItem(STORAGE_KEY, "your_auth_token_value");
-            }
-        }
-
-        // ✅ 쿠키 삭제 함수
-        function clearAuthCookie() {
-            document.cookie = `${COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=None; Secure`;
-            localStorage.removeItem(STORAGE_KEY);
-            console.log("🗑 인증 쿠키 및 로컬 스토리지 삭제 완료");
-            updateStatusMessage("🗑 인증 데이터가 삭제되었습니다.", "black");
-        }
-
-        // ✅ 쿠키 또는 로컬 스토리지에서 인증 상태 확인
-        function checkAuthStatus() {
-            if (document.cookie.includes(COOKIE_NAME)) {
-                updateStatusMessage("✅ 쿠키를 통한 인증이 유지되고 있습니다.", "green");
-            } else if (localStorage.getItem(STORAGE_KEY)) {
-                updateStatusMessage("✅ 로컬 스토리지 인증 사용 중!", "blue");
-            } else {
-                updateStatusMessage("❌ 인증 정보가 없습니다.", "red");
-            }
-        }
-
-        // ✅ 상태 메시지 업데이트 함수
-        function updateStatusMessage(message, color) {
-            const statusMessage = document.getElementById("statusMessage");
-            statusMessage.innerText = message;
-            statusMessage.style.color = color;
-        }
-
-        // 버튼 이벤트 리스너 등록
-        document.getElementById("checkCookieButton").addEventListener("click", checkAuthStatus);
-        document.getElementById("setCookieButton").addEventListener("click", setAuthCookie);
-        document.getElementById("clearCookieButton").addEventListener("click", clearAuthCookie);
-
-        // 페이지 로드 시 쿠키 및 CHIPS 지원 여부 확인
-        checkThirdPartyCookies();
-        checkCHIPS();
-    </script>
+    <!-- JavaScript 연결 -->
+    <script src="script.js"></script>
 
 </body>
 </html>
