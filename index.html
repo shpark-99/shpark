@@ -15,7 +15,7 @@
 <h2>📍 위치 인증 시스템</h2>
 <div>
     <input type="text" id="addressInput" placeholder="기준 위치 주소 입력">
-    <button onclick="setBaseLocation()">📍 기준 위치 설정</button>
+    <button id="setLocationBtn" onclick="setBaseLocation()">📍 기준 위치 설정</button>
 </div>
 <br>
 <button id="verifyButton" onclick="verifyMyLocation()" disabled>내 위치 인증</button>
@@ -31,14 +31,29 @@ function initMap() {
     map = new kakao.maps.Map(container, { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 5 });
     geocoder = new kakao.maps.services.Geocoder();
     console.log("✅ 카카오 지도 초기화 완료!");
+
+    // Kakao API 로드 후 geometry 사용 가능 여부 확인
+    setTimeout(() => {
+        if (!kakao.maps.geometry) {
+            console.error("❌ Kakao Maps geometry 라이브러리 로드 실패! 다시 시도합니다...");
+            location.reload();
+        } else {
+            console.log("✅ Kakao Maps API 정상 로드됨");
+        }
+    }, 3000);
 }
 
 function setBaseLocation() {
     const address = document.getElementById("addressInput").value.trim();
+    const setLocationBtn = document.getElementById("setLocationBtn");
+    
     if (!address) {
-        alert("주소를 입력하세요!");
+        alert("📌 주소를 입력하세요!");
         return;
     }
+
+    // 버튼 비활성화 (사용자가 중복 클릭 못 하도록)
+    setLocationBtn.disabled = true;
 
     geocoder.addressSearch(address, function(result, status) {
         if (status === kakao.maps.services.Status.OK) {
@@ -62,6 +77,9 @@ function setBaseLocation() {
         } else {
             alert("❌ 주소 검색 실패! 올바른 주소를 입력하세요.");
         }
+        
+        // 버튼 다시 활성화
+        setLocationBtn.disabled = false;
     });
 }
 
@@ -70,6 +88,9 @@ function verifyMyLocation() {
         alert("❌ 기준 위치를 먼저 설정하세요!");
         return;
     }
+
+    const verifyButton = document.getElementById("verifyButton");
+    verifyButton.disabled = true; // 위치 인증 중 버튼 비활성화
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -87,30 +108,32 @@ function verifyMyLocation() {
                 });
 
                 checkDistance(userLocation);
+                verifyButton.disabled = false; // 인증 완료 후 버튼 다시 활성화
             },
             function(error) {
                 alert("❌ 위치 정보를 가져올 수 없습니다! (에러 코드: " + error.code + ")");
+                verifyButton.disabled = false; // 실패 시 버튼 다시 활성화
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
         );
     } else {
         alert("❌ 이 브라우저에서는 위치 정보를 지원하지 않습니다!");
+        verifyButton.disabled = false;
     }
 }
 
 function checkDistance(userLocation) {
     if (!kakao.maps.geometry) {
-        alert("❌ kakao.maps.geometry가 로드되지 않았습니다. 라이브러리 설정을 확인하세요.");
+        alert("❌ Kakao Maps geometry 라이브러리가 없습니다. 페이지를 새로고침 해보세요.");
         return;
     }
 
     const distance = kakao.maps.geometry.computeDistanceBetween(targetLocation, userLocation);
     console.log(`📏 거리: ${distance.toFixed(2)}m`);
-    const statusMessage = document.getElementById("statusMessage");
 
     if (distance <= 300) {
         updateStatusMessage("✅ 위치 인증 성공! 반경 300m 이내입니다.", "green");
-        document.getElementById("verifyButton").disabled = true; // 인증 버튼 비활성화
+        document.getElementById("verifyButton").disabled = true; // 인증 완료 후 버튼 비활성화
     } else {
         updateStatusMessage("❌ 위치 인증 실패! 반경을 벗어났습니다.", "red");
     }
@@ -122,7 +145,8 @@ function updateStatusMessage(message, color) {
     statusMessage.style.color = color;
 }
 
-window.onload = initMap;
+// Kakao Maps API가 로드된 후 initMap 실행
+kakao.maps.load(initMap);
 </script>
 </body>
 </html>
