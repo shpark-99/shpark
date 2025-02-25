@@ -1,7 +1,19 @@
-<div class="header">
-    <h2>📍 관리자 위치 설정</h2>
-    <button class="button nav-btn" onclick="location.href='user.html'">사용자 페이지 →</button>
-</div>
-<input type="text" id="adminAddress" class="input-box" placeholder="주소 입력">
-<button class="button" onclick="setAdminLocation()">위치 저장</button>
-<div id="map" class="map-container"></div>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 위치 설정</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services"></script>
+    <script defer src="script-admin.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h2>📍 관리자 위치 설정</h2>
+        <button class="button nav-btn" onclick="location.href='user.html'">사용자 페이지 →</button>
+    </div>
+    <input type="text" id="adminAddress" class="input-box" placeholder="주소 입력">
+    <button class="button" onclick="setAdminLocation()">위치 저장</button>
+    <div id="map" class="map-container"></div>
+</body>
+</html>
