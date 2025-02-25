@@ -1,59 +1,50 @@
-:root {
-    --primary: #0064FF;
-    --bg: #F2F4F6;
-    --text: #333;
-    --success: #00C896;
-    --error: #FF4758;
-}
-
+/* 전체 배경 */
 body {
     font-family: 'Pretendard', sans-serif;
-    background-color: var(--bg);
-    color: var(--text);
+    background: #F2F3F5;
+    color: #333;
     margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* 컨테이너 */
+.container {
+    width: 90%;
+    max-width: 400px;
+    background: #E5E7EB;
+    border-radius: 20px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1), -5px -5px 15px rgba(255, 255, 255, 0.6);
+    padding: 20px;
     text-align: center;
 }
 
-header {
-    background-color: var(--primary);
-    color: white;
-    padding: 20px;
-    font-size: 1.2rem;
+/* 버튼 */
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
     font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+    background: #E5E7EB;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.6);
 }
 
-main {
-    padding: 20px;
+button:active {
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.15), inset -3px -3px 6px rgba(255, 255, 255, 0.7);
 }
 
+/* 지도 */
 #map {
     width: 100%;
-    height: 300px;
-    margin: 20px 0;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-button {
-    background-color: var(--primary);
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-button:disabled {
-    background-color: #ccc;
-}
-
-.success-text {
-    color: var(--success);
-    font-weight: bold;
-}
-
-.error-text {
-    color: var(--error);
-    font-weight: bold;
+    height: 250px;
+    border-radius: 15px;
+    margin-top: 15px;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.6);
 }
