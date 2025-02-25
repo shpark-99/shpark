@@ -2,7 +2,7 @@
 body {
     font-family: 'Pretendard', sans-serif;
     background: #F2F3F5;
-    color: #333;
+    color: #FFFFFF; /* 흰색 글씨 */
     margin: 0;
     padding: 0;
     display: flex;
@@ -15,9 +15,9 @@ body {
 .container {
     width: 90%;
     max-width: 400px;
-    background: #E5E7EB;
+    background: #2C2F36; /* 어두운 배경 */
     border-radius: 20px;
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1), -5px -5px 15px rgba(255, 255, 255, 0.6);
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1), -5px -5px 15px rgba(255, 255, 255, 0.2);
     padding: 20px;
     text-align: center;
 }
@@ -32,12 +32,13 @@ button {
     font-weight: bold;
     cursor: pointer;
     transition: 0.3s ease;
-    background: #E5E7EB;
-    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.6);
+    background: #3A3D44;
+    color: #FFFFFF; /* 버튼 글씨도 흰색 */
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.2);
 }
 
 button:active {
-    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.15), inset -3px -3px 6px rgba(255, 255, 255, 0.7);
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.15), inset -3px -3px 6px rgba(255, 255, 255, 0.3);
 }
 
 /* 지도 */
@@ -46,5 +47,5 @@ button:active {
     height: 250px;
     border-radius: 15px;
     margin-top: 15px;
-    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.6);
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.2);
 }
