@@ -2,20 +2,23 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>사용자 위치 인증</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services" async defer></script>
-    <script defer src="script-user.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>위치 인증</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <script defer src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services"></script>
+    <script defer src="assets/script-user.js"></script>
 </head>
 <body>
-    <div class="header">
-        <h2>📌 사용자 위치 인증</h2>
-        <button class="button nav-btn" onclick="location.href='admin.html'">← 관리자 페이지</button>
-    </div>
-    <div>설정된 위치: <span id="adminAddress"></span></div>
-    <div>내 위치: <span id="userAddress"></span></div>
-    <div id="map" class="map-container"></div>
-    <div id="result" class="result-box"></div>
-    <button id="surveyBtn" class="button hidden" onclick="location.href='survey.html'">📋 설문 시작</button>
+    <header>
+        <h1>📍 위치 인증</h1>
+    </header>
+
+    <main>
+        <div id="map"></div>
+        <p id="adminAddress"></p>
+        <p id="userAddress"></p>
+        <div id="result"></div>
+        <button id="surveyBtn" style="display: none;">설문 시작</button>
+    </main>
 </body>
 </html>
