@@ -1,4 +1,16 @@
 window.onload = function () {
+    if (typeof kakao !== "undefined" && kakao.maps) {
+        initMap();
+    } else {
+        const script = document.createElement("script");
+        script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services";
+        script.async = true;
+        script.onload = initMap;
+        document.head.appendChild(script);
+    }
+};
+
+function initMap() {
     if (!window.kakao || !window.kakao.maps) {
         console.error("Kakao Maps API 로드 실패");
         return;
@@ -91,4 +103,4 @@ window.onload = function () {
             alert("위치 정보를 가져올 수 없습니다. 위치 권한을 허용해주세요.");
         }
     );
-};
+}
