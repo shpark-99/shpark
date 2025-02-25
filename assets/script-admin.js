@@ -1,23 +1,28 @@
-window.onload = function () {
-    var container = document.getElementById('map');
-    var options = {
-        center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 기준
-        level: 3
-    };
+const geocoder = new kakao.maps.services.Geocoder();
+const mapContainer = document.getElementById('map');
+const map = new kakao.maps.Map(mapContainer, { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 3 });
+const marker = new kakao.maps.Marker({ position: map.getCenter() });
+marker.setMap(map);
 
-    var map = new kakao.maps.Map(container, options);
+function setAdminLocation() {
+    const address = document.getElementById('adminAddress').value;
+    geocoder.addressSearch(address, function(result, status) {
+        if (status === kakao.maps.services.Status.OK) {
+            const lat = result[0].y;
+            const lng = result[0].x;
+            updateMap(lat, lng);
 
-    // 현재 위치 가져오기
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            var lat = position.coords.latitude;
-            var lon = position.coords.longitude;
-            var locPosition = new kakao.maps.LatLng(lat, lon);
-            
-            // 마커 표시
-            var marker = new kakao.maps.Marker({ position: locPosition });
-            marker.setMap(map);
-            map.setCenter(locPosition);
-        });
-    }
-};
+            // 관리자 위치 저장
+            localStorage.setItem('adminLocation', JSON.stringify({ lat, lng }));
+            alert('위치 저장 완료!');
+        } else {
+            alert('주소를 찾을 수 없습니다.');
+        }
+    });
+}
+
+function updateMap(lat, lng) {
+    const newPosition = new kakao.maps.LatLng(lat, lng);
+    map.setCenter(newPosition);
+    marker.setPosition(newPosition);
+}
