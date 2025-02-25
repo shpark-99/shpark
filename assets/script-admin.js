@@ -1,22 +1,22 @@
-window.onload = function () {
-    const mapContainer = document.getElementById("map");
-    const map = new kakao.maps.Map(mapContainer, { level: 3 });
+function initMap() {
+    if (!window.kakao || !window.kakao.maps) {
+        console.error("Kakao Maps SDK 로드 실패");
+        return;
+    }
 
-    navigator.geolocation.getCurrentPosition(
-        (pos) => {
-            const lat = pos.coords.latitude, lng = pos.coords.longitude;
-            const marker = new kakao.maps.Marker({
-                position: new kakao.maps.LatLng(lat, lng),
-                map: map,
-            });
+    var container = document.getElementById('map');
+    var options = {
+        center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 기준
+        level: 3
+    };
+    var map = new kakao.maps.Map(container, options);
+}
 
-            map.setCenter(new kakao.maps.LatLng(lat, lng));
+function loadKakaoMap() {
+    var script = document.createElement("script");
+    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services";
+    script.onload = initMap;
+    document.head.appendChild(script);
+}
 
-            document.getElementById("setLocationBtn").addEventListener("click", function () {
-                localStorage.setItem("adminLocation", JSON.stringify({ lat, lng }));
-                alert("위치가 설정되었습니다!");
-            });
-        },
-        () => alert("위치를 불러올 수 없습니다.")
-    );
-};
+window.onload = loadKakaoMap;
