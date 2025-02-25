@@ -1,4 +1,16 @@
 window.onload = function () {
+    // Kakao API 스크립트 동적으로 추가
+    if (typeof kakao === "undefined") {
+        const script = document.createElement("script");
+        script.async = true;
+        script.onload = initMap; // 스크립트 로드 완료 후 실행
+        document.head.appendChild(script);
+    } else {
+        initMap(); // 이미 로드되어 있다면 바로 실행
+    }
+};
+
+function initMap() {
     if (typeof kakao === "undefined") {
         alert("카카오맵 API 로드 실패! 네트워크 상태를 확인하세요.");
         return;
@@ -6,6 +18,11 @@ window.onload = function () {
 
     kakao.maps.load(function () {
         const mapContainer = document.getElementById("map");
+        if (!mapContainer) {
+            alert("지도를 표시할 요소가 없습니다.");
+            return;
+        }
+
         const map = new kakao.maps.Map(mapContainer, { level: 3 });
 
         // 관리자 위치 가져오기
@@ -14,7 +31,7 @@ window.onload = function () {
             alert("관리자가 위치를 설정하지 않았습니다.");
             return;
         }
-        
+
         document.getElementById("adminAddress").innerText = `(${adminLocation.lat}, ${adminLocation.lng})`;
 
         // 지도 크기 조정
@@ -64,4 +81,4 @@ window.onload = function () {
             }
         );
     });
-};
+}
