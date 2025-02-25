@@ -2,19 +2,17 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>관리자 페이지</title>
+    <title>관리자 위치 설정</title>
     <link rel="stylesheet" href="assets/styles.css">
-    <script defer src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services"></script>
     <script defer src="assets/script-admin.js"></script>
 </head>
 <body>
-
     <div class="container">
-        <h2>관리자 페이지</h2>
-        <p>현재 위치를 지도에서 확인하세요</p>
+        <h2>📍 관리자 위치 설정</h2>
+        <input type="text" id="adminAddress" placeholder="주소 입력">
+        <button onclick="setAdminLocation()">위치 저장</button>
         <div id="map"></div>
     </div>
-
 </body>
 </html>
