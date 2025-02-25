@@ -18,7 +18,7 @@ function initMap() {
 
     const geocoder = new kakao.maps.services.Geocoder();
     const mapContainer = document.getElementById("map");
-    const map = new kakao.maps.Map(mapContainer, { level: 3 });
+    const map = new kakao.maps.Map(mapContainer, { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 3 });
 
     // 🎯 관리자 위치 불러오기
     const adminLocation = JSON.parse(localStorage.getItem("adminLocation"));
