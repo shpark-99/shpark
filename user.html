@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <title>사용자 위치 인증</title>
     <link rel="stylesheet" href="assets/styles.css">
-    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services"></script>
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services"></script>
     <script defer src="assets/script-user.js"></script>
 </head>
 <body>
     <div class="container">
-        <h2>📌 사용자 위치 인증</h2>
-        <p>사용자 위치: <span id="userAddress"></span></p>
+        <h2> 사용자 위치 인증</h2>
+        <p>🔵 관리자 위치: <span id="adminAddress"></span></p>
+        <p>🟢 내 위치: <span id="userAddress"></span></p>
         <div id="map"></div>
         <div id="result"></div>
         <button id="surveyBtn" style="display:none;">📋 설문 참여</button>
