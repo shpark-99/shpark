@@ -1,13 +1,14 @@
-function initMap() {
+window.onload = function () {
     if (!window.kakao || !window.kakao.maps) {
         console.error("Kakao Maps API 로드 실패");
         return;
     }
 
+    const geocoder = new kakao.maps.services.Geocoder();
     const mapContainer = document.getElementById("map");
     const map = new kakao.maps.Map(mapContainer, { level: 3 });
 
-    // 관리자 위치 가져오기
+    // 🎯 관리자 위치 불러오기
     const adminLocation = JSON.parse(localStorage.getItem("adminLocation"));
     if (!adminLocation) {
         alert("관리자가 위치를 설정하지 않았습니다.");
@@ -36,7 +37,7 @@ function initMap() {
 
     map.setCenter(new kakao.maps.LatLng(adminLocation.lat, adminLocation.lng));
 
-    // 사용자 위치 가져오기
+    // 🎯 사용자 위치 가져오기
     navigator.geolocation.getCurrentPosition(
         (pos) => {
             const userLat = pos.coords.latitude;
@@ -50,7 +51,6 @@ function initMap() {
             });
 
             // 사용자 도로명 주소 가져오기
-            const geocoder = new kakao.maps.services.Geocoder();
             geocoder.coord2Address(userLng, userLat, function (result, status) {
                 if (status === kakao.maps.services.Status.OK) {
                     document.getElementById("userAddress").innerText = result[0].road_address
@@ -91,17 +91,4 @@ function initMap() {
             alert("위치 정보를 가져올 수 없습니다. 위치 권한을 허용해주세요.");
         }
     );
-}
-
-// Kakao Maps API 로드 후 실행
-window.onload = function () {
-    if (typeof kakao !== "undefined" && kakao.maps) {
-        initMap();
-    } else {
-        const script = document.createElement("script");
-        script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a50e768349b68eac92037c8858d7a462&libraries=services";
-        script.async = true;
-        script.onload = initMap;
-        document.head.appendChild(script);
-    }
 };
